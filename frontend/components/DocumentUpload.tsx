@@ -1,18 +1,29 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { uploadDocument, type DocumentResponse } from '@/lib/api';
 
 interface Props {
   onUploaded: (doc: DocumentResponse) => void;
 }
 
-export default function DocumentUpload({ onUploaded }: Props) {
+export interface DocumentUploadHandle {
+  trigger: () => void;
+}
+
+const DocumentUpload = forwardRef<DocumentUploadHandle, Props>(function DocumentUpload(
+  { onUploaded },
+  ref
+) {
   const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    trigger: () => inputRef.current?.click(),
+  }));
 
   const MAX_SIZE = 50 * 1024 * 1024;
 
@@ -28,14 +39,10 @@ export default function DocumentUpload({ onUploaded }: Props) {
 
   async function handleFile(file: File) {
     const err = validate(file);
-    if (err) {
-      setError(err);
-      return;
-    }
+    if (err) { setError(err); return; }
     setError(null);
     setUploading(true);
     setProgress(10);
-
     try {
       const tick = setInterval(() => setProgress((p) => Math.min(p + 15, 85)), 300);
       const doc = await uploadDocument(file);
@@ -65,89 +72,87 @@ export default function DocumentUpload({ onUploaded }: Props) {
 
   return (
     <div className="w-full">
-      {/* Drop zone — background shift, no border */}
-      <div
-        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-        onDragLeave={() => setDragging(false)}
-        onDrop={onDrop}
-        className={`flex flex-col items-center justify-center gap-4 rounded-xl p-12 transition-colors duration-200 ${
-          dragging ? 'bg-accent' : 'bg-card'
-        }`}
-      >
-        {/* Icon in surface-variant circle */}
-        <div className="flex size-14 items-center justify-center rounded-full bg-[#391647]">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="size-6 text-primary"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
-            />
-          </svg>
-        </div>
+      {/* Glow wrapper */}
+      <div className="relative group cursor-pointer">
+        <div className="absolute -inset-1 bg-primary/20 rounded-[2rem] blur opacity-25 group-hover:opacity-50 transition duration-700" />
 
-        <div className="text-center">
-          <p className="text-sm font-medium text-foreground">
-            Drop your PDF here, or{' '}
+        {/* Drop zone */}
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={onDrop}
+          className={`relative rounded-[2rem] p-16 flex flex-col items-center justify-center text-center transition-all border-2 border-dashed ${
+            dragging
+              ? 'bg-[#161a20] border-primary/50'
+              : 'bg-[#000000] border-[rgba(68,72,81,0.3)] hover:bg-[#111319] hover:border-primary/40'
+          }`}
+        >
+          {/* Icon */}
+          <div className="w-20 h-20 rounded-2xl bg-[#1c2027] flex items-center justify-center mb-6 shadow-2xl">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="size-9 text-primary"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.338-2.32 5.75 5.75 0 011.076 11.095H6.75z" />
+            </svg>
+          </div>
+
+          <h3 className="text-3xl font-headline font-bold mb-3 tracking-tight text-foreground">
+            Drop your research here
+          </h3>
+          <p className="text-muted-foreground max-w-md mx-auto mb-8 font-body font-medium">
+            Upload PDF documents to transform them into interactive knowledge artifacts. Max file size 50 MB.
+          </p>
+
+          <div className="flex gap-4">
             <button
               type="button"
               onClick={() => inputRef.current?.click()}
-              className="cursor-pointer text-primary underline-offset-2 hover:underline"
+              disabled={uploading}
+              className="px-8 py-3 bg-[#22262e] hover:bg-[#282c34] text-foreground font-semibold rounded-full transition-colors flex items-center gap-2 disabled:opacity-50"
             >
-              browse
+              <svg xmlns="http://www.w3.org/2000/svg" className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9.776c.112-.017.227-.026.344-.026h15.812c.117 0 .232.009.344.026m-16.5 0a2.25 2.25 0 00-1.883 2.542l.857 6a2.25 2.25 0 002.227 1.932H19.05a2.25 2.25 0 002.227-1.932l.857-6a2.25 2.25 0 00-1.883-2.542m-16.5 0V6A2.25 2.25 0 016 3.75h3.879a1.5 1.5 0 011.06.44l2.122 2.12a1.5 1.5 0 001.06.44H18A2.25 2.25 0 0120.25 9v.776" />
+              </svg>
+              Browse Files
             </button>
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">Max 50 MB · PDF only</p>
+          </div>
+
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".pdf,application/pdf"
+            className="hidden"
+            onChange={onInputChange}
+          />
         </div>
-
-        {!uploading && (
-          <button
-            type="button"
-            onClick={() => inputRef.current?.click()}
-            className="mt-1 rounded-[0.375rem] px-5 py-2 text-sm font-semibold text-[#1b0425] transition-opacity hover:opacity-90"
-            style={{ backgroundImage: 'linear-gradient(135deg, #cc97ff, #9c48ea)' }}
-          >
-            Select PDF
-          </button>
-        )}
-
-        <input
-          ref={inputRef}
-          type="file"
-          accept=".pdf,application/pdf"
-          className="hidden"
-          onChange={onInputChange}
-        />
       </div>
 
       {/* Progress bar */}
       {uploading && (
-        <div className="mt-4">
-          <div className="mb-1.5 flex justify-between text-xs text-muted-foreground">
+        <div className="mt-5">
+          <div className="mb-1.5 flex justify-between text-xs text-muted-foreground font-body">
             <span>Uploading…</span>
             <span>{progress}%</span>
           </div>
-          <div className="h-1 w-full overflow-hidden rounded-full bg-[#391647]">
+          <div className="h-1 w-full overflow-hidden rounded-full bg-[#22262e]">
             <div
-              className="h-full rounded-full transition-all duration-300"
-              style={{
-                width: `${progress}%`,
-                backgroundImage: 'linear-gradient(135deg, #cc97ff, #9c48ea)',
-              }}
+              className="h-full rounded-full transition-all duration-300 primary-gradient"
+              style={{ width: `${progress}%` }}
             />
           </div>
         </div>
       )}
 
       {error && (
-        <p className="mt-3 text-sm text-destructive">{error}</p>
+        <p className="mt-4 text-sm text-destructive font-body">{error}</p>
       )}
     </div>
   );
-}
+});
+
+export default DocumentUpload;

@@ -10,13 +10,7 @@
   --font-sans: var(--font-manrope);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-manrope);
-  /* Obsidian custom surface tokens */
-  --color-surface-low: var(--surface-low);
-  --color-surface-high: var(--surface-high);
-  --color-surface-variant: var(--surface-variant);
-  --color-primary-dim: var(--primary-dim);
-  --color-on-surface-variant: var(--on-surface-variant);
-  --color-tertiary: var(--tertiary);
+  --font-body: var(--font-inter);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,96 +43,111 @@
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: calc(var(--radius) * 1.5);
+  --radius-2xl: calc(var(--radius) * 2);
+  --radius-3xl: calc(var(--radius) * 3);
+  /* Stitch surface token extensions */
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+  --color-primary-dim: var(--primary-dim);
+  --color-primary-container: var(--primary-container);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-secondary-container: var(--secondary-container);
 }
 
 :root {
-  /* ── Obsidian Aesthetic (dark-only design) ── */
-  --background: #1b0425;
-  --foreground: #fadcff;
-  --card: #22072d;
-  --card-foreground: #fadcff;
-  --popover: #22072d;
-  --popover-foreground: #fadcff;
-  --primary: #cc97ff;
-  --primary-foreground: #1b0425;
-  --secondary: #391647;
-  --secondary-foreground: #c2a0ca;
-  --muted: #391647;
-  --muted-foreground: #c2a0ca;
-  --accent: #31113e;
-  --accent-foreground: #fadcff;
-  --destructive: #ff95a0;
-  --border: color-mix(in srgb, #593e63 15%, transparent);
+  /* ── Stitch "AI Document Chat" Palette ── */
+  --background: #0c0e12;
+  --foreground: #e2e5f0;
+  --card: #111319;
+  --card-foreground: #e2e5f0;
+  --popover: #1c2027;
+  --popover-foreground: #e2e5f0;
+  --primary: #a855f7;
+  --primary-foreground: #ffffff;
+  --secondary: #b3cad4;
+  --secondary-foreground: #0c0e12;
+  --muted: #22262e;
+  --muted-foreground: #a7abb5;
+  --accent: #1c2027;
+  --accent-foreground: #e2e5f0;
+  --destructive: #fa746f;
+  --border: rgba(68, 72, 81, 0.2);
   --input: #000000;
-  --ring: #cc97ff;
-  --radius: 0.625rem;
-  /* Obsidian surface tokens */
-  --surface-low: #22072d;
-  --surface-high: #31113e;
-  --surface-variant: #391647;
-  --primary-dim: #9c48ea;
-  --on-surface-variant: #c2a0ca;
-  --tertiary: #ff95a0;
+  --ring: #a855f7;
+  --radius: 0.5rem;
+  /* Surface hierarchy */
+  --surface-container-lowest: #000000;
+  --surface-container-low: #111319;
+  --surface-container: #161a20;
+  --surface-container-high: #1c2027;
+  --surface-container-highest: #22262e;
+  --primary-dim: #9333ea;
+  --primary-container: #7c3aed;
+  --on-surface-variant: #a7abb5;
+  --secondary-container: #293f46;
   /* Charts */
-  --chart-1: #cc97ff;
-  --chart-2: #9c48ea;
-  --chart-3: #ff95a0;
-  --chart-4: #6a2785;
-  --chart-5: #391647;
+  --chart-1: #a855f7;
+  --chart-2: #9333ea;
+  --chart-3: #d5e3ff;
+  --chart-4: #293f46;
+  --chart-5: #22262e;
   /* Sidebar */
-  --sidebar: #22072d;
-  --sidebar-foreground: #fadcff;
-  --sidebar-primary: #cc97ff;
-  --sidebar-primary-foreground: #1b0425;
-  --sidebar-accent: #31113e;
-  --sidebar-accent-foreground: #fadcff;
-  --sidebar-border: color-mix(in srgb, #593e63 15%, transparent);
-  --sidebar-ring: #cc97ff;
+  --sidebar: #111319;
+  --sidebar-foreground: #e2e5f0;
+  --sidebar-primary: #a855f7;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1c2027;
+  --sidebar-accent-foreground: #e2e5f0;
+  --sidebar-border: rgba(68, 72, 81, 0.1);
+  --sidebar-ring: #a855f7;
 }
 
 .dark {
-  /* Same as :root — Obsidian is always dark */
-  --background: #1b0425;
-  --foreground: #fadcff;
-  --card: #22072d;
-  --card-foreground: #fadcff;
-  --popover: #22072d;
-  --popover-foreground: #fadcff;
-  --primary: #cc97ff;
-  --primary-foreground: #1b0425;
-  --secondary: #391647;
-  --secondary-foreground: #c2a0ca;
-  --muted: #391647;
-  --muted-foreground: #c2a0ca;
-  --accent: #31113e;
-  --accent-foreground: #fadcff;
-  --destructive: #ff95a0;
-  --border: color-mix(in srgb, #593e63 15%, transparent);
+  /* Same as :root — dark-only design */
+  --background: #0c0e12;
+  --foreground: #e2e5f0;
+  --card: #111319;
+  --card-foreground: #e2e5f0;
+  --popover: #1c2027;
+  --popover-foreground: #e2e5f0;
+  --primary: #a855f7;
+  --primary-foreground: #ffffff;
+  --secondary: #b3cad4;
+  --secondary-foreground: #0c0e12;
+  --muted: #22262e;
+  --muted-foreground: #a7abb5;
+  --accent: #1c2027;
+  --accent-foreground: #e2e5f0;
+  --destructive: #fa746f;
+  --border: rgba(68, 72, 81, 0.2);
   --input: #000000;
-  --ring: #cc97ff;
-  --surface-low: #22072d;
-  --surface-high: #31113e;
-  --surface-variant: #391647;
-  --primary-dim: #9c48ea;
-  --on-surface-variant: #c2a0ca;
-  --tertiary: #ff95a0;
-  --chart-1: #cc97ff;
-  --chart-2: #9c48ea;
-  --chart-3: #ff95a0;
-  --chart-4: #6a2785;
-  --chart-5: #391647;
-  --sidebar: #22072d;
-  --sidebar-foreground: #fadcff;
-  --sidebar-primary: #cc97ff;
-  --sidebar-primary-foreground: #1b0425;
-  --sidebar-accent: #31113e;
-  --sidebar-accent-foreground: #fadcff;
-  --sidebar-border: color-mix(in srgb, #593e63 15%, transparent);
-  --sidebar-ring: #cc97ff;
+  --ring: #a855f7;
+  --surface-container-lowest: #000000;
+  --surface-container-low: #111319;
+  --surface-container: #161a20;
+  --surface-container-high: #1c2027;
+  --surface-container-highest: #22262e;
+  --primary-dim: #9333ea;
+  --primary-container: #7c3aed;
+  --on-surface-variant: #a7abb5;
+  --secondary-container: #293f46;
+  --chart-1: #a855f7;
+  --chart-2: #9333ea;
+  --chart-3: #d5e3ff;
+  --chart-4: #293f46;
+  --chart-5: #22262e;
+  --sidebar: #111319;
+  --sidebar-foreground: #e2e5f0;
+  --sidebar-primary: #a855f7;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1c2027;
+  --sidebar-accent-foreground: #e2e5f0;
+  --sidebar-border: rgba(68, 72, 81, 0.1);
+  --sidebar-ring: #a855f7;
 }
 
 @layer base {
@@ -147,8 +156,27 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-inter), sans-serif;
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .ghost-border {
+    border: 1px solid rgba(68, 72, 81, 0.15);
+  }
+  .primary-gradient {
+    background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  }
+  .bg-obsidian-well {
+    background: radial-gradient(circle at center, #111319 0%, #0c0e12 100%);
+  }
+  .font-headline {
+    font-family: var(--font-manrope), sans-serif;
+  }
+  .font-body {
+    font-family: var(--font-inter), sans-serif;
   }
 }
