@@ -23,6 +23,7 @@ export interface DocumentListItem {
 
 export interface DocumentDetail extends DocumentListItem {
   error_msg: string | null;
+  signed_url: string | null;
 }
 
 export interface ChatMessage {
@@ -79,7 +80,9 @@ export async function deleteDocument(id: string): Promise<void> {
   }
 }
 
-export async function getChatHistory(documentId: string): Promise<ChatMessage[]> {
+export async function getChatHistory(
+  documentId: string
+): Promise<ChatMessage[]> {
   const res = await fetch(`${BASE_URL}/chat/${documentId}/history`);
   return handleResponse<ChatMessage[]>(res);
 }

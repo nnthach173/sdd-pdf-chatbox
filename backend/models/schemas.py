@@ -29,6 +29,7 @@ class DocumentDetail(DocumentListItem):
     """Returned in GET /documents/{id} — includes error_msg for polling."""
 
     error_msg: Optional[str]
+    signed_url: Optional[str] = None
 
 
 class ChatRequest(BaseModel):

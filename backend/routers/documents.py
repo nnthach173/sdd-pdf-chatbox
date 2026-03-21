@@ -52,14 +52,14 @@ def _process_document(document_id: str, file_bytes: bytes) -> None:
         db.table("document_chunks").insert(rows).execute()
 
         # 5. Mark document as ready
-        db.table("documents").update(
-            {"status": "ready", "page_count": page_count}
-        ).eq("id", document_id).execute()
+        db.table("documents").update({"status": "ready", "page_count": page_count}).eq(
+            "id", document_id
+        ).execute()
 
     except ScannedPDFError as e:
-        db.table("documents").update(
-            {"status": "failed", "error_msg": str(e)}
-        ).eq("id", document_id).execute()
+        db.table("documents").update({"status": "failed", "error_msg": str(e)}).eq(
+            "id", document_id
+        ).execute()
     except Exception as e:
         db.table("documents").update(
             {"status": "failed", "error_msg": f"Processing error: {e}"}
@@ -82,7 +82,10 @@ async def upload_document(
     ).lower().endswith(".pdf"):
         raise HTTPException(
             status_code=400,
-            detail={"error": "invalid_file_type", "message": "Only PDF files are supported. Please upload a .pdf file."},
+            detail={
+                "error": "invalid_file_type",
+                "message": "Only PDF files are supported. Please upload a .pdf file.",
+            },
         )
 
     file_bytes = await file.read()
@@ -91,14 +94,20 @@ async def upload_document(
     if len(file_bytes) > MAX_FILE_SIZE:
         raise HTTPException(
             status_code=400,
-            detail={"error": "file_too_large", "message": "File exceeds the 50 MB limit."},
+            detail={
+                "error": "file_too_large",
+                "message": "File exceeds the 50 MB limit.",
+            },
         )
 
     # Re-check MIME by reading the PDF header
     if not file_bytes.startswith(b"%PDF"):
         raise HTTPException(
             status_code=400,
-            detail={"error": "invalid_file_type", "message": "Only PDF files are supported. Please upload a .pdf file."},
+            detail={
+                "error": "invalid_file_type",
+                "message": "Only PDF files are supported. Please upload a .pdf file.",
+            },
         )
 
     db = get_supabase()
@@ -106,7 +115,9 @@ async def upload_document(
     storage_path = f"{doc_id}/{file.filename}"
 
     # Upload to Supabase Storage (bucket: pdfs)
-    print(f"DEBUG: uploading {file.filename} ({len(file_bytes)} bytes) to storage path {storage_path}")
+    print(
+        f"DEBUG: uploading {file.filename} ({len(file_bytes)} bytes) to storage path {storage_path}"
+    )
     try:
         db.storage.from_("pdfs").upload(
             path=storage_path,
@@ -117,20 +128,27 @@ async def upload_document(
         print(f"DEBUG storage error: {e}")
         raise HTTPException(
             status_code=500,
-            detail={"error": "upload_failed", "message": f"Could not store the file: {e}"},
+            detail={
+                "error": "upload_failed",
+                "message": f"Could not store the file: {e}",
+            },
         )
 
     print("DEBUG: storage upload ok, inserting DB record")
     # Create the database record
-    row = db.table("documents").insert(
-        {
-            "id": doc_id,
-            "name": file.filename,
-            "file_path": storage_path,
-            "file_size": len(file_bytes),
-            "status": "processing",
-        }
-    ).execute()
+    row = (
+        db.table("documents")
+        .insert(
+            {
+                "id": doc_id,
+                "name": file.filename,
+                "file_path": storage_path,
+                "file_size": len(file_bytes),
+                "status": "processing",
+            }
+        )
+        .execute()
+    )
 
     doc = row.data[0]
 
@@ -165,18 +183,27 @@ def list_documents() -> list[DocumentListItem]:
 @router.get("/{doc_id}", response_model=DocumentDetail)
 def get_document(doc_id: str) -> DocumentDetail:
     db = get_supabase()
-    rows = (
-        db.table("documents")
-        .select("*")
-        .eq("id", doc_id)
-        .execute()
-    )
+    rows = db.table("documents").select("*").eq("id", doc_id).execute()
     if not rows.data:
         raise HTTPException(
             status_code=404,
             detail={"error": "not_found", "message": "Document not found."},
         )
-    return DocumentDetail(**rows.data[0])
+    doc = rows.data[0]
+    signed_url = None
+    if doc["status"] == "ready":
+        try:
+            result = db.storage.from_("pdfs").create_signed_url(doc["file_path"], 3600)
+            signed_url = result["signedURL"]
+        except Exception:
+            raise HTTPException(
+                status_code=500,
+                detail={
+                    "error": "signed_url_failed",
+                    "message": "Could not generate a secure access link for this document. Please try again.",
+                },
+            )
+    return DocumentDetail(**doc, signed_url=signed_url)
 
 
 # ---------------------------------------------------------------------------
@@ -210,7 +237,10 @@ def delete_document(doc_id: str) -> Response:
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail={"error": "delete_failed", "message": f"Could not delete document: {e}"},
+            detail={
+                "error": "delete_failed",
+                "message": f"Could not delete document: {e}",
+            },
         )
 
     return Response(status_code=204)
