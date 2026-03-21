@@ -1,0 +1,154 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-manrope);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-manrope);
+  /* Obsidian custom surface tokens */
+  --color-surface-low: var(--surface-low);
+  --color-surface-high: var(--surface-high);
+  --color-surface-variant: var(--surface-variant);
+  --color-primary-dim: var(--primary-dim);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-tertiary: var(--tertiary);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* ── Obsidian Aesthetic (dark-only design) ── */
+  --background: #1b0425;
+  --foreground: #fadcff;
+  --card: #22072d;
+  --card-foreground: #fadcff;
+  --popover: #22072d;
+  --popover-foreground: #fadcff;
+  --primary: #cc97ff;
+  --primary-foreground: #1b0425;
+  --secondary: #391647;
+  --secondary-foreground: #c2a0ca;
+  --muted: #391647;
+  --muted-foreground: #c2a0ca;
+  --accent: #31113e;
+  --accent-foreground: #fadcff;
+  --destructive: #ff95a0;
+  --border: color-mix(in srgb, #593e63 15%, transparent);
+  --input: #000000;
+  --ring: #cc97ff;
+  --radius: 0.625rem;
+  /* Obsidian surface tokens */
+  --surface-low: #22072d;
+  --surface-high: #31113e;
+  --surface-variant: #391647;
+  --primary-dim: #9c48ea;
+  --on-surface-variant: #c2a0ca;
+  --tertiary: #ff95a0;
+  /* Charts */
+  --chart-1: #cc97ff;
+  --chart-2: #9c48ea;
+  --chart-3: #ff95a0;
+  --chart-4: #6a2785;
+  --chart-5: #391647;
+  /* Sidebar */
+  --sidebar: #22072d;
+  --sidebar-foreground: #fadcff;
+  --sidebar-primary: #cc97ff;
+  --sidebar-primary-foreground: #1b0425;
+  --sidebar-accent: #31113e;
+  --sidebar-accent-foreground: #fadcff;
+  --sidebar-border: color-mix(in srgb, #593e63 15%, transparent);
+  --sidebar-ring: #cc97ff;
+}
+
+.dark {
+  /* Same as :root — Obsidian is always dark */
+  --background: #1b0425;
+  --foreground: #fadcff;
+  --card: #22072d;
+  --card-foreground: #fadcff;
+  --popover: #22072d;
+  --popover-foreground: #fadcff;
+  --primary: #cc97ff;
+  --primary-foreground: #1b0425;
+  --secondary: #391647;
+  --secondary-foreground: #c2a0ca;
+  --muted: #391647;
+  --muted-foreground: #c2a0ca;
+  --accent: #31113e;
+  --accent-foreground: #fadcff;
+  --destructive: #ff95a0;
+  --border: color-mix(in srgb, #593e63 15%, transparent);
+  --input: #000000;
+  --ring: #cc97ff;
+  --surface-low: #22072d;
+  --surface-high: #31113e;
+  --surface-variant: #391647;
+  --primary-dim: #9c48ea;
+  --on-surface-variant: #c2a0ca;
+  --tertiary: #ff95a0;
+  --chart-1: #cc97ff;
+  --chart-2: #9c48ea;
+  --chart-3: #ff95a0;
+  --chart-4: #6a2785;
+  --chart-5: #391647;
+  --sidebar: #22072d;
+  --sidebar-foreground: #fadcff;
+  --sidebar-primary: #cc97ff;
+  --sidebar-primary-foreground: #1b0425;
+  --sidebar-accent: #31113e;
+  --sidebar-accent-foreground: #fadcff;
+  --sidebar-border: color-mix(in srgb, #593e63 15%, transparent);
+  --sidebar-ring: #cc97ff;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
