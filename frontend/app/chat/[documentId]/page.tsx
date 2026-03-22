@@ -126,8 +126,11 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      {/* Branded header with tab navigation */}
-      <ChatPageHeader documentName={doc.name} activeTab="chat" />
+      {/* Top app bar — document info + search + icons */}
+      <ChatPageHeader
+        documentName={doc.name}
+        documentStatus={doc.status as 'processing' | 'ready' | 'error'}
+      />
 
       {/* Three-panel content area */}
       <div className="flex flex-1 overflow-hidden">
