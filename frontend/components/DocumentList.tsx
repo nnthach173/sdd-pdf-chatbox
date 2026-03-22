@@ -6,9 +6,10 @@ import DocumentCard from '@/components/DocumentCard';
 interface Props {
   documents: DocumentListItem[];
   onDeleted: (id: string) => void;
+  onOpen: (id: string) => void;
 }
 
-export default function DocumentList({ documents, onDeleted }: Props) {
+export default function DocumentList({ documents, onDeleted, onOpen }: Props) {
   if (documents.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 py-24 text-center">
@@ -37,7 +38,7 @@ export default function DocumentList({ documents, onDeleted }: Props) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {documents.map((doc) => (
-        <DocumentCard key={doc.id} doc={doc} onDeleted={onDeleted} />
+        <DocumentCard key={doc.id} doc={doc} onDeleted={onDeleted} onOpen={onOpen} />
       ))}
     </div>
   );

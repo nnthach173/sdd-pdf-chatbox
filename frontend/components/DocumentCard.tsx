@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { deleteDocument, type DocumentListItem } from '@/lib/api';
 import {
   Dialog,
@@ -16,6 +15,7 @@ import {
 interface Props {
   doc: DocumentListItem;
   onDeleted: (id: string) => void;
+  onOpen: (id: string) => void;
 }
 
 function formatBytes(bytes: number): string {
@@ -55,8 +55,7 @@ function getStatusConfig(status: string): StatusConfig {
   }
 }
 
-export default function DocumentCard({ doc, onDeleted }: Props) {
-  const router = useRouter();
+export default function DocumentCard({ doc, onDeleted, onOpen }: Props) {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -114,7 +113,7 @@ export default function DocumentCard({ doc, onDeleted }: Props) {
         className={`text-base font-bold mb-2 line-clamp-1 transition-colors ${
           isReady ? 'group-hover:text-primary cursor-pointer' : ''
         }`}
-        onClick={() => isReady && router.push(`/chat/${doc.id}`)}
+        onClick={() => isReady && onOpen(doc.id)}
       >
         {doc.name}
       </h4>
@@ -140,7 +139,7 @@ export default function DocumentCard({ doc, onDeleted }: Props) {
       {/* Action buttons */}
       <div className={`mt-auto flex gap-3 ${isPending ? 'opacity-50 cursor-not-allowed' : ''}`}>
         <button
-          onClick={() => isReady && router.push(`/chat/${doc.id}`)}
+          onClick={() => isReady && onOpen(doc.id)}
           disabled={!isReady}
           className="flex-1 py-3 bg-[#22262e] hover:bg-primary hover:text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:pointer-events-none"
         >
