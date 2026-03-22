@@ -10,6 +10,8 @@ import {
   type DocumentDetail,
 } from '@/lib/api';
 import ChatInterface from '@/components/ChatInterface';
+import ChatPageHeader from '@/components/ChatPageHeader';
+import DocumentSidebar from '@/components/DocumentSidebar';
 import PanelDivider from '@/components/PanelDivider';
 import { Button } from '@/components/ui/button';
 
@@ -124,73 +126,55 @@ export default function ChatPage() {
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
-      {/* Header */}
-      <header className="flex items-center gap-3 border-b bg-background px-4 py-3">
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={() => router.push('/')}
-          aria-label="Back"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="size-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-        </Button>
-        <div className="min-w-0 flex-1">
-          <h1 className="truncate text-sm font-semibold">{doc.name}</h1>
-          {doc.page_count != null && (
-            <p className="text-xs text-muted-foreground">
-              {doc.page_count} pages
-            </p>
-          )}
-        </div>
-      </header>
+      {/* Top app bar — document info + search + icons */}
+      <ChatPageHeader
+        documentName={doc.name}
+        documentStatus={doc.status as 'processing' | 'ready' | 'error'}
+      />
 
-      {/* Split panels */}
-      <div
-        ref={containerRef}
-        className="flex flex-1 flex-col overflow-hidden md:flex-row"
-      >
-        {/* Left: PDF panel */}
-        <div
-          className="w-full h-[50vh] overflow-y-auto md:h-full"
-          style={isDesktop ? { width: `${leftPct}%` } : undefined}
-        >
-          {doc.status === 'ready' && doc.signed_url ? (
-            <PdfViewer signedUrl={doc.signed_url} />
-          ) : (
-            <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
-              <div className="size-4 animate-spin rounded-full border-2 border-muted border-t-primary" />
-              <p className="text-sm text-muted-foreground">
-                Document is still processing…
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Divider — hidden on mobile */}
-        <PanelDivider
-          onMouseDown={handleDividerMouseDown}
-          onTouchStart={handleDividerTouchStart}
+      {/* Three-panel content area */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left: Document sidebar */}
+        <DocumentSidebar
+          documentName={doc.name}
+          documentStatus={doc.status as 'processing' | 'ready' | 'error'}
         />
 
-        {/* Right: Chat panel */}
+        {/* Center + Right: PDF viewer + divider + chat panel */}
         <div
-          className="w-full flex-1 overflow-y-auto md:h-full flex flex-col"
-          style={isDesktop ? { width: `${100 - leftPct}%` } : undefined}
+          ref={containerRef}
+          className="flex flex-1 flex-col overflow-hidden md:flex-row"
         >
-          <ChatInterface documentId={documentId} initialMessages={history} />
+          {/* PDF panel */}
+          <div
+            className="w-full h-[50vh] overflow-y-auto md:h-full"
+            style={isDesktop ? { width: `${leftPct}%` } : undefined}
+          >
+            {doc.status === 'ready' && doc.signed_url ? (
+              <PdfViewer signedUrl={doc.signed_url} />
+            ) : (
+              <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
+                <div className="size-4 animate-spin rounded-full border-2 border-muted border-t-primary" />
+                <p className="text-sm text-muted-foreground">
+                  Document is still processing…
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Divider — hidden on mobile */}
+          <PanelDivider
+            onMouseDown={handleDividerMouseDown}
+            onTouchStart={handleDividerTouchStart}
+          />
+
+          {/* Chat panel */}
+          <div
+            className="w-full flex-1 overflow-y-auto md:h-full flex flex-col"
+            style={isDesktop ? { width: `${100 - leftPct}%` } : undefined}
+          >
+            <ChatInterface documentId={documentId} initialMessages={history} />
+          </div>
         </div>
       </div>
     </div>

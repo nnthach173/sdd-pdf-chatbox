@@ -1,7 +1,10 @@
-import { type ComponentProps } from 'react';
+'use client';
+
+import { type ComponentProps, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
+import { Check, Copy, RefreshCw, ShieldCheck } from 'lucide-react';
 import { type ChatMessage as ChatMessageType } from '@/lib/api';
 
 interface Props {
@@ -50,9 +53,17 @@ const markdownComponents = {
 
 export default function ChatMessage({ message }: Props) {
   const isUser = message.role === 'user';
+  const [copied, setCopied] = useState(false);
+
+  function handleCopy() {
+    navigator.clipboard.writeText(message.content).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    });
+  }
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
       <div
         className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
           isUser
@@ -72,6 +83,31 @@ export default function ChatMessage({ message }: Props) {
           </ReactMarkdown>
         )}
       </div>
+
+      {/* Action buttons — assistant messages only */}
+      {!isUser && (
+        <div className="flex items-center gap-1 mt-1 px-1">
+          <button
+            onClick={handleCopy}
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="Copy message"
+          >
+            {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+          </button>
+          <button
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="Regenerate response"
+          >
+            <RefreshCw className="size-3.5" />
+          </button>
+          <button
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="Verify critical data"
+          >
+            <ShieldCheck className="size-3.5" />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
