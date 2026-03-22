@@ -1,0 +1,50 @@
+name: Auto-merge to main
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check for conflicts and auto-merge into main
+        run: |
+          FEATURE_BRANCH="${{ github.ref_name }}"
+          echo "🔍 Checking if '$FEATURE_BRANCH' can be merged into main without conflicts..."
+
+          git checkout main
+          git pull origin main
+
+          # Attempt a dry-run merge (no commit, no fast-forward)
+          if git merge --no-commit --no-ff "origin/$FEATURE_BRANCH" 2>/dev/null; then
+            # Clean up the staged dry-run
+            git merge --abort 2>/dev/null || git reset --merge 2>/dev/null || true
+
+            # Perform the real merge
+            git merge --no-ff "origin/$FEATURE_BRANCH" \
+              -m "chore: auto-merge '$FEATURE_BRANCH' into main (no conflicts detected)"
+
+            git push origin main
+            echo "✅ Successfully merged '$FEATURE_BRANCH' into main."
+          else
+            git merge --abort 2>/dev/null || git reset --merge 2>/dev/null || true
+            echo "⚠️  Conflicts detected in '$FEATURE_BRANCH' — skipping auto-merge."
+            echo "    Resolve conflicts manually and merge into main."
+            exit 0
+          fi
