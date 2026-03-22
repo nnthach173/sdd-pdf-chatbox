@@ -15,21 +15,33 @@ const markdownComponents = {
     </a>
   ),
   h1: ({ children }: ComponentProps<'h1'>) => (
-    <h2 className="text-lg font-bold mt-2 mb-1">{children}</h2>
+    <h1 className="text-lg font-bold mt-2 mb-1">{children}</h1>
   ),
   h2: ({ children }: ComponentProps<'h2'>) => (
-    <h3 className="text-base font-bold mt-1.5 mb-0.5">{children}</h3>
+    <h2 className="text-base font-bold mt-1.5 mb-0.5">{children}</h2>
   ),
   h3: ({ children }: ComponentProps<'h3'>) => (
-    <h4 className="text-sm font-semibold mt-1 mb-0.5">{children}</h4>
+    <h3 className="text-sm font-semibold mt-1 mb-0.5">{children}</h3>
   ),
-  code: ({ children, className, ...props }: ComponentProps<'code'>) => (
-    <code className={`${className ?? ''} bg-muted/50 rounded px-1 py-0.5 text-xs`} {...props}>
+  code: ({ children, className, ...props }: ComponentProps<'code'>) => {
+    const isBlock = Boolean(className?.startsWith('language-'));
+    if (isBlock) {
+      return (
+        <code className={className} {...props}>
+          {children}
+        </code>
+      );
+    }
+    return (
+      <code className={`${className ?? ''} bg-muted/50 rounded px-1 py-0.5 text-xs`} {...props}>
+        {children}
+      </code>
+    );
+  },
+  pre: ({ children, className, ...props }: ComponentProps<'pre'>) => (
+    <pre className={`${className ?? ''} bg-muted/50 rounded p-3 overflow-x-auto text-xs my-2`} {...props}>
       {children}
-    </code>
-  ),
-  pre: ({ children }: ComponentProps<'pre'>) => (
-    <pre className="bg-muted/50 rounded p-3 overflow-x-auto text-xs my-2">{children}</pre>
+    </pre>
   ),
   table: ({ children }: ComponentProps<'table'>) => (
     <table className="text-xs border-collapse w-full my-2">{children}</table>
