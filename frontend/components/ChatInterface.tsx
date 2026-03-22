@@ -3,8 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { streamChat, type ChatMessage as ChatMessageType } from '@/lib/api';
 import ChatMessage from '@/components/ChatMessage';
+import MetadataExplorer from '@/components/MetadataExplorer';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Image, Paperclip } from 'lucide-react';
 
 interface Props {
   documentId: string;
@@ -112,6 +114,9 @@ export default function ChatInterface({ documentId, initialMessages }: Props) {
         <div ref={bottomRef} />
       </div>
 
+      {/* Metadata Explorer */}
+      <MetadataExplorer />
+
       {/* Error banner */}
       {error && (
         <div className="mx-4 mb-2 rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
@@ -122,6 +127,19 @@ export default function ChatInterface({ documentId, initialMessages }: Props) {
       {/* Input bar */}
       <div className="border-t bg-background px-4 py-3">
         <div className="flex items-end gap-2">
+          {/* Attachment placeholder icons */}
+          <button
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors shrink-0"
+            aria-label="Attach file"
+          >
+            <Paperclip className="size-4" />
+          </button>
+          <button
+            className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors shrink-0"
+            aria-label="Upload image"
+          >
+            <Image className="size-4" />
+          </button>
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
