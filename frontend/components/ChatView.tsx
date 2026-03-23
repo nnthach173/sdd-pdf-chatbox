@@ -200,7 +200,7 @@ export default function ChatView({ documentId, onDocumentLoaded }: Props) {
         </div>
 
         {/* Active panel */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex flex-1 flex-col overflow-hidden">
           {activeTab === 'pdf' ? (
             doc.status === 'ready' && doc.signed_url ? (
               <PdfViewer signedUrl={doc.signed_url} />
@@ -222,7 +222,7 @@ export default function ChatView({ documentId, onDocumentLoaded }: Props) {
   return (
     <div ref={containerRef} className="flex flex-1 overflow-hidden">
       {/* PDF panel */}
-      <div className="overflow-y-auto h-full" style={{ width: `${leftPct}%` }}>
+      <div className="h-full" style={{ width: `${leftPct}%` }}>
         {doc.status === 'ready' && doc.signed_url ? (
           <PdfViewer signedUrl={doc.signed_url} />
         ) : (
@@ -240,7 +240,7 @@ export default function ChatView({ documentId, onDocumentLoaded }: Props) {
       />
 
       {/* Chat panel */}
-      <div className="flex flex-col overflow-y-auto h-full" style={{ width: `${100 - leftPct}%` }}>
+      <div className="flex flex-col overflow-hidden h-full" style={{ width: `${100 - leftPct}%` }}>
         <ChatInterface documentId={documentId} initialMessages={history} />
       </div>
     </div>

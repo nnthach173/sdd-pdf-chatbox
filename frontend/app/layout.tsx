@@ -34,7 +34,7 @@ export default function RootLayout({
       lang="en"
       className={`${manrope.variable} ${inter.variable} ${geistMono.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="h-full">{children}</body>
     </html>
   );
 }

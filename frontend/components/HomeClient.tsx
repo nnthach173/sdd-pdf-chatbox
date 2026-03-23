@@ -34,13 +34,13 @@ export default function HomeClient() {
   const activeView = activeDocId ? 'chat' : 'library';
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex h-screen overflow-hidden bg-background text-foreground">
       <AppSidebar
         activeView={activeView}
         onNavigate={handleNavigate}
         onUpload={() => libraryViewRef.current?.triggerUpload()}
       />
-      <div className="ml-64 flex flex-1 flex-col min-h-screen bg-obsidian-well">
+      <div className="ml-64 flex flex-1 flex-col overflow-hidden bg-obsidian-well">
         <AppHeader
           docName={activeDocId ? docName : null}
           docStatus={activeDocId ? docStatus : null}

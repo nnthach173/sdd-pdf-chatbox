@@ -1,6 +1,6 @@
 ﻿# pdf-chatbox Development Guidelines
 
-Auto-generated from all feature plans. Last updated: 2026-03-22
+Auto-generated from all feature plans. Last updated: 2026-03-23
 
 ## Active Technologies
 - [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (002-pdf-split-view)
@@ -11,6 +11,9 @@ Auto-generated from all feature plans. Last updated: 2026-03-22
 - Supabase Storage — signed URL via `create_signed_url(file_path, expires_in=3600)` (002-pdf-split-view)
 - TypeScript / Next.js (App Router) — frontend only + React 19, Next.js `useSearchParams`, `useRouter`, Tailwind CSS, existing components (PanelDivider, PdfViewer, ChatInterface, DocumentUpload, DocumentList) (005-persistent-layout-nav)
 - `localStorage` for split ratio preference (key: `obsidian-split-ratio`) (005-persistent-layout-nav)
+- TypeScript / React 19 + Next.js 14 (App Router), Tailwind CSS (006-chat-independent-scroll)
+- N/A — frontend layout change only (006-chat-independent-scroll)
+- TypeScript / React 19 + Next.js 16.2.0 (App Router) + Tailwind CSS (layout utility classes only) (007-independent-scroll)
 
 - Python 3.11 (backend) · TypeScript / Node 18+ (frontend) + FastAPI, LangChain, pypdf, openai, supabase-py, uvicorn (001-pdf-rag-chatbox)
 
@@ -31,9 +34,9 @@ cd src; pytest; ruff check .
 Python 3.11 (backend) · TypeScript / Node 18+ (frontend): Follow standard conventions
 
 ## Recent Changes
+- 007-independent-scroll: Added TypeScript / React 19 + Next.js 16.2.0 (App Router) + Tailwind CSS (layout utility classes only)
+- 006-chat-independent-scroll: Added TypeScript / React 19 + Next.js 14 (App Router), Tailwind CSS
 - 005-persistent-layout-nav: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
-- 005-persistent-layout-nav: Added TypeScript / Next.js (App Router) — frontend only + React 19, Next.js `useSearchParams`, `useRouter`, Tailwind CSS, existing components (PanelDivider, PdfViewer, ChatInterface, DocumentUpload, DocumentList)
-- 002-pdf-split-view: Added Python 3.11 (backend) · TypeScript / Next.js 16.2.0 with React 19 (frontend) + FastAPI, supabase-py (backend) · `react-pdf` v9.x, Tailwind CSS, shadcn/ui (frontend)
 
 
 <!-- MANUAL ADDITIONS START -->
