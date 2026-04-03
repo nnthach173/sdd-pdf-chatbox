@@ -25,7 +25,7 @@ This is a web app: `backend/` (FastAPI) + `frontend/` (Next.js) at repo root.
 
 - [x] T001 Patch `backend/main.py`: replace hardcoded `allow_origins=["http://localhost:3000"]` with `os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")` and add `import os` at the top (see contracts/environment-contracts.md for exact pattern)
 - [x] T002 Remove the `# T029: Add the Vercel deploy URL…` TODO comment from `backend/main.py` (no longer needed after T001)
-- [ ] T003 Commit and push the `backend/main.py` change to the `012-free-deployment` branch
+- [x] T003 Commit and push the `backend/main.py` change to the `012-free-deployment` branch
 
 **Checkpoint**: `git push` succeeds; Render and Vercel will auto-deploy from this branch.
 
@@ -37,12 +37,12 @@ This is a web app: `backend/` (FastAPI) + `frontend/` (Next.js) at repo root.
 
 **Independent Test**: `GET https://<service>.onrender.com/health` returns `{"status":"ok"}` within 35 seconds.
 
-- [ ] T004 [US2] Create a new Render **Web Service**: connect GitHub repo, set root directory to `backend/`, runtime to Python 3, plan to **Free**
-- [ ] T005 [US2] Set Render build command: `pip install -r requirements.txt`
-- [ ] T006 [US2] Set Render start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-- [ ] T007 [US2] Add Render environment variables: `SUPABASE_URL`, `SUPABASE_KEY` (service_role key), `OPENAI_API_KEY`, `PYTHON_VERSION=3.11`, and `ALLOWED_ORIGINS=http://localhost:3000` (placeholder — updated in Phase 4)
-- [ ] T008 [US2] Trigger first Render deploy; monitor build logs until deploy status shows **Live**
-- [ ] T009 [US2] Verify backend health: open `https://<service>.onrender.com/health` in browser and confirm `{"status":"ok"}` — note the full Render URL for use in Phase 3
+- [x] T004 [US2] Create a new Render **Web Service**: connect GitHub repo, set root directory to `backend/`, runtime to Python 3, plan to **Free**
+- [x] T005 [US2] Set Render build command: `pip install -r requirements.txt`
+- [x] T006 [US2] Set Render start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- [x] T007 [US2] Add Render environment variables: `SUPABASE_URL`, `SUPABASE_KEY` (service_role key), `OPENAI_API_KEY`, `PYTHON_VERSION=3.11`, and `ALLOWED_ORIGINS=http://localhost:3000` (placeholder — updated in Phase 4)
+- [x] T008 [US2] Trigger first Render deploy; monitor build logs until deploy status shows **Live**
+- [x] T009 [US2] Verify backend health: open `https://<service>.onrender.com/health` in browser and confirm `{"status":"ok"}` — note the full Render URL for use in Phase 3
 
 **Checkpoint**: Backend is live. Render URL is confirmed. Frontend can now be deployed.
 
@@ -54,10 +54,10 @@ This is a web app: `backend/` (FastAPI) + `frontend/` (Next.js) at repo root.
 
 **Independent Test**: Navigate to the Vercel URL — the homepage loads within 5 seconds.
 
-- [ ] T010 [US1] Create a new Vercel project: import the GitHub repo, set root directory to `frontend/`, framework preset to **Next.js**
-- [ ] T011 [US1] Add Vercel environment variables (Production scope): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_API_URL=https://<service>.onrender.com` (use Render URL from T009)
-- [ ] T012 [US1] Trigger first Vercel deploy; wait for **Ready** status
-- [ ] T013 [US1] Open the Vercel production URL and confirm the homepage renders without console errors — note the full Vercel URL for use in Phase 4
+- [x] T010 [US1] Create a new Vercel project: import the GitHub repo, set root directory to `frontend/`, framework preset to **Next.js**
+- [x] T011 [US1] Add Vercel environment variables (Production scope): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `NEXT_PUBLIC_API_URL=https://<service>.onrender.com` (use Render URL from T009)
+- [x] T012 [US1] Trigger first Vercel deploy; wait for **Ready** status
+- [x] T013 [US1] Open the Vercel production URL and confirm the homepage renders without console errors — note the full Vercel URL for use in Phase 4
 
 **Checkpoint**: Frontend is live. Vercel URL is confirmed. CORS and Auth must now be wired.
 
@@ -69,9 +69,9 @@ This is a web app: `backend/` (FastAPI) + `frontend/` (Next.js) at repo root.
 
 **Independent Test**: Upload a PDF as a guest user — the request reaches the backend with no CORS error.
 
-- [ ] T014 [US2] Update Render environment variable `ALLOWED_ORIGINS` to the Vercel production URL (e.g., `https://<project>.vercel.app`) — Render will auto-redeploy
-- [ ] T015 [US1] In the Supabase dashboard → **Authentication → URL Configuration**: set **Site URL** to the Vercel URL and add `https://<project>.vercel.app/**` to **Redirect URLs**
-- [ ] T016 Wait for Render redeploy to finish (check Render deploy logs); then test CORS by uploading a PDF from the Vercel frontend — confirm no CORS error in browser DevTools Network tab
+- [x] T014 [US2] Update Render environment variable `ALLOWED_ORIGINS` to the Vercel production URL (e.g., `https://<project>.vercel.app`) — Render will auto-redeploy
+- [x] T015 [US1] In the Supabase dashboard → **Authentication → URL Configuration**: set **Site URL** to the Vercel URL and add `https://<project>.vercel.app/**` to **Redirect URLs**
+- [x] T016 Wait for Render redeploy to finish (check Render deploy logs); then test CORS by uploading a PDF from the Vercel frontend — confirm no CORS error in browser DevTools Network tab
 
 **Checkpoint**: Full stack connected. Guest upload reaches the backend and returns a document ID.
 
@@ -83,9 +83,9 @@ This is a web app: `backend/` (FastAPI) + `frontend/` (Next.js) at repo root.
 
 **Independent Test**: Both hosting dashboards show $0 billed after first billing cycle.
 
-- [ ] T017 [P] [US3] Check Render dashboard → **Billing**: confirm the Web Service is on the Free plan and current usage shows $0
-- [ ] T018 [P] [US3] Check Vercel dashboard → **Usage**: confirm the project is on the Hobby plan with no charges and bandwidth is well below the 100 GB/month limit
-- [ ] T019 [US3] Document the free-tier limits observed (Render: 750 compute-hours/mo; Vercel: 100 GB bandwidth) in `specs/012-free-deployment/quickstart.md` under a new **Free-Tier Limits Reference** section
+- [x] T017 [P] [US3] Check Render dashboard → **Billing**: confirm the Web Service is on the Free plan and current usage shows $0
+- [x] T018 [P] [US3] Check Vercel dashboard → **Usage**: confirm the project is on the Hobby plan with no charges and bandwidth is well below the 100 GB/month limit
+- [x] T019 [US3] Document the free-tier limits observed (Render: 750 compute-hours/mo; Vercel: 100 GB bandwidth) in `specs/012-free-deployment/quickstart.md` under a new **Free-Tier Limits Reference** section
 
 **Checkpoint**: Both platforms confirmed free. Cost constraint from spec is satisfied.
 
@@ -97,11 +97,11 @@ This is a web app: `backend/` (FastAPI) + `frontend/` (Next.js) at repo root.
 
 **Independent Test**: Complete the end-to-end checklist — all 5 items pass.
 
-- [ ] T020 [US4] Verify guest flow: upload a PDF (≤1 MB) as a guest user → PDF appears in the document list with status `ready`
-- [ ] T021 [US4] Verify PDF viewer: click the uploaded PDF → split-view panel renders the PDF without errors (signed URL is valid)
-- [ ] T022 [US4] Verify AI chat: type a question about the PDF → streamed AI response appears token-by-token in the chat panel
-- [ ] T023 [US4] Verify auth flow: register a new account via email → confirm the email confirmation link redirects correctly to the Vercel URL (Supabase Auth redirect URL test)
-- [ ] T024 [US4] Verify authenticated user flow: log in → upload a second PDF → confirm it appears only in the authenticated user's document list (not in guest list)
+- [x] T020 [US4] Verify guest flow: upload a PDF (≤1 MB) as a guest user → PDF appears in the document list with status `ready`
+- [x] T021 [US4] Verify PDF viewer: click the uploaded PDF → split-view panel renders the PDF without errors (signed URL is valid)
+- [x] T022 [US4] Verify AI chat: type a question about the PDF → streamed AI response appears token-by-token in the chat panel
+- [x] T023 [US4] Verify auth flow: register a new account via email → confirm the email confirmation link redirects correctly to the Vercel URL (Supabase Auth redirect URL test)
+- [x] T024 [US4] Verify authenticated user flow: log in → upload a second PDF → confirm it appears only in the authenticated user's document list (not in guest list)
 
 **Checkpoint**: All four user stories are validated. The deployment is production-ready for <100 users.
 
