@@ -62,6 +62,27 @@ def retrieve_chunks(
     return [row["content"] for row in result.data]
 
 
+def retrieve_chunks_sequential(
+    document_id: str,
+    top_k: int = 15,
+) -> list[str]:
+    """Return the first top_k chunks in document order (by chunk_index).
+
+    Used for summary questions where vector similarity is unreliable because
+    the query language may not match the document language.
+    """
+    db = get_supabase()
+    result = (
+        db.table("document_chunks")
+        .select("content")
+        .eq("document_id", document_id)
+        .order("chunk_index", desc=False)
+        .limit(top_k)
+        .execute()
+    )
+    return [row["content"] for row in result.data]
+
+
 def build_prompt(
     chunks: list[str],
     history: list[dict],

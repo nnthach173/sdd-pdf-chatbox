@@ -8,7 +8,7 @@ from models.schemas import ChatMessageResponse, ChatRequest
 from models.schemas import UserProfile
 from routers.dependencies import get_user_or_guest
 from services.embedding_service import embed_chunks
-from services.rag_service import build_prompt, is_summary_question, retrieve_chunks, stream_response
+from services.rag_service import build_prompt, is_summary_question, retrieve_chunks, retrieve_chunks_sequential, stream_response
 
 router = APIRouter()
 
@@ -58,9 +58,12 @@ async def chat(
             detail={"error": "chat_failed", "message": f"Embedding failed: {e}"},
         )
 
-    # Retrieve more chunks for broad/summary questions
-    top_k = 15 if is_summary_question(body.question) else 5
-    chunks = retrieve_chunks(document_id, question_embedding, top_k=top_k)
+    # For summary questions, fetch by document order instead of vector similarity
+    # to avoid language mismatch between query and document content
+    if is_summary_question(body.question):
+        chunks = retrieve_chunks_sequential(document_id, top_k=15)
+    else:
+        chunks = retrieve_chunks(document_id, question_embedding)
 
     # Fetch last 6 messages for context
     history_rows = (
