@@ -15,6 +15,22 @@ def _get_async_client() -> AsyncOpenAI:
     return _async_client
 
 
+_SUMMARY_KEYWORDS = {
+    # English
+    "summarize", "summary", "overview", "outline", "brief", "recap", "describe the pdf",
+    "what is this document", "what does this document", "what is the document about",
+    "what is this pdf", "what is the pdf about",
+    # Vietnamese
+    "tóm tắt", "tổng quan", "mô tả", "giới thiệu",
+}
+
+
+def is_summary_question(question: str) -> bool:
+    """Return True if the question is asking for a broad summary rather than a specific fact."""
+    q = question.lower()
+    return any(kw in q for kw in _SUMMARY_KEYWORDS)
+
+
 def retrieve_chunks(
     document_id: str,
     question_embedding: list[float],
