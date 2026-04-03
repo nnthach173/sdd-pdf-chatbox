@@ -1,4 +1,6 @@
 import io
+import re
+import unicodedata
 import uuid
 
 import pypdf
@@ -13,6 +15,15 @@ from services.embedding_service import embed_chunks
 from services.pdf_service import ScannedPDFError, chunk_text, extract_text
 
 router = APIRouter()
+
+
+def _safe_filename(filename: str) -> str:
+    """Return an ASCII-safe version of filename for use in storage paths."""
+    normalized = unicodedata.normalize("NFKD", filename)
+    ascii_name = normalized.encode("ascii", "ignore").decode("ascii")
+    ascii_name = re.sub(r"[^\w.\-]", "_", ascii_name)
+    return ascii_name or "file.pdf"
+
 
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
 GUEST_MAX_FILE_SIZE = 1 * 1024 * 1024  # 1 MB
@@ -128,7 +139,8 @@ async def upload_document(
     db = get_supabase()
     doc_id = str(uuid.uuid4())
     # Namespace by owner so each visitor's files are isolated in storage
-    storage_path = f"{owner_id}/{doc_id}/{file.filename}"
+    safe_name = _safe_filename(file.filename or "file.pdf")
+    storage_path = f"{owner_id}/{doc_id}/{safe_name}"
 
     # Upload to Supabase Storage (bucket: pdfs)
     print(
