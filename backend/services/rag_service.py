@@ -96,10 +96,11 @@ def build_prompt(
     context_block = "\n\n---\n\n".join(chunks) if chunks else "No relevant content found."
 
     system = (
-        "You are a helpful assistant that answers questions strictly based on the "
-        "provided document excerpts. If the answer cannot be found in the excerpts, "
-        "say so clearly — do not draw on outside knowledge.\n\n"
-        f"Document excerpts:\n{context_block}"
+        "You are a helpful assistant. The following are excerpts from the user's document — "
+        "treat them as the full content of the document. Answer questions based solely on "
+        "this content. Do not say you lack access to the document or PDF; you have been "
+        "given its content below. If the answer is not present in the excerpts, say so.\n\n"
+        f"Document content:\n{context_block}"
     )
 
     messages: list[dict] = [{"role": "system", "content": system}]
