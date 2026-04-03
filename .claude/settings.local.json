@@ -1,7 +1,29 @@
 {
   "permissions": {
     "allow": [
-      "Bash(claude mcp:*)"
+      "Bash(claude mcp:*)",
+      "Bash(powershell.exe -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json)",
+      "Bash(powershell.exe -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -RequireTasks -IncludeTasks)",
+      "Bash(python -m pytest)",
+      "Bash(bash .specify/scripts/powershell/create-new-feature.ps1 \"Add user authentication system with Google OAuth and email/password login, per-user PDF storage\" --json --short-name \"user-auth\" \"Add user authentication\")",
+      "Bash(powershell -File .specify/scripts/powershell/create-new-feature.ps1 \"Add user authentication system with Google OAuth and email/password login, per-user PDF storage\" -Json -ShortName \"user-auth\" \"Add user authentication\")",
+      "Bash(powershell -File .specify/scripts/powershell/check-prerequisites.ps1 -Json -PathsOnly)",
+      "Bash(powershell -File .specify/scripts/powershell/setup-plan.ps1 -Json)",
+      "Bash(powershell -File .specify/scripts/powershell/update-agent-context.ps1 -AgentType claude)",
+      "Bash(powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/check-prerequisites.ps1 -Json)",
+      "Bash(powershell -ExecutionPolicy Bypass -File .specify/scripts/powershell/check-prerequisites.ps1 -Json -RequireTasks -IncludeTasks)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(python -c \"from routers import auth, documents, chat; from models.schemas import UserProfile; print\\(''OK''\\)\")",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/create-new-feature.ps1 ''Guest homepage access without forced login redirect'' -Json -ShortName ''guest-homepage-access'' ''Allow users to access homepage as guest without being redirected to login page''\")",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json -PathsOnly\")",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/setup-plan.ps1 -Json\")",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/update-agent-context.ps1 -AgentType claude\")",
+      "Bash(powershell.exe -Command \".specify/scripts/powershell/check-prerequisites.ps1 -Json\")",
+      "Bash(powershell.exe -File \".specify/scripts/powershell/check-prerequisites.ps1\" -Json -PathsOnly)",
+      "Bash(powershell.exe -File \".specify/scripts/powershell/setup-plan.ps1\" -Json)",
+      "Bash(powershell.exe -File \".specify/scripts/powershell/update-agent-context.ps1\" -AgentType claude)",
+      "Bash(git add:*)"
     ]
   }
 }

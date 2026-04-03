@@ -7,13 +7,15 @@ from fastapi.responses import Response
 
 from database.supabase_client import get_supabase
 from models.schemas import DocumentDetail, DocumentListItem, DocumentResponse
-from routers.dependencies import get_owner_id
+from models.schemas import UserProfile
+from routers.dependencies import get_user_or_guest
 from services.embedding_service import embed_chunks
 from services.pdf_service import ScannedPDFError, chunk_text, extract_text
 
 router = APIRouter()
 
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB
+GUEST_MAX_FILE_SIZE = 1 * 1024 * 1024  # 1 MB
 
 
 # ---------------------------------------------------------------------------
@@ -76,8 +78,9 @@ def _process_document(document_id: str, file_bytes: bytes) -> None:
 async def upload_document(
     file: UploadFile,
     background_tasks: BackgroundTasks,
-    owner_id: str = Depends(get_owner_id),
+    user: UserProfile = Depends(get_user_or_guest),
 ) -> DocumentResponse:
+    owner_id = user.id
     # Validate file type
     if file.content_type != "application/pdf" and not (
         file.filename or ""
@@ -91,6 +94,16 @@ async def upload_document(
         )
 
     file_bytes = await file.read()
+
+    # Validate guest file size
+    if user.is_guest and len(file_bytes) > GUEST_MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail={
+                "error": "file_too_large_guest",
+                "message": "File exceeds the 1 MB limit for guests. Sign in to upload files up to 50 MB.",
+            },
+        )
 
     # Validate file size
     if len(file_bytes) > MAX_FILE_SIZE:
@@ -168,7 +181,8 @@ async def upload_document(
 
 
 @router.get("", response_model=list[DocumentListItem])
-def list_documents(owner_id: str = Depends(get_owner_id)) -> list[DocumentListItem]:
+def list_documents(user: UserProfile = Depends(get_user_or_guest)) -> list[DocumentListItem]:
+    owner_id = user.id
     db = get_supabase()
     rows = (
         db.table("documents")
@@ -186,7 +200,8 @@ def list_documents(owner_id: str = Depends(get_owner_id)) -> list[DocumentListIt
 
 
 @router.get("/{doc_id}", response_model=DocumentDetail)
-def get_document(doc_id: str, owner_id: str = Depends(get_owner_id)) -> DocumentDetail:
+def get_document(doc_id: str, user: UserProfile = Depends(get_user_or_guest)) -> DocumentDetail:
+    owner_id = user.id
     db = get_supabase()
     rows = db.table("documents").select("*").eq("id", doc_id).execute()
     if not rows.data or rows.data[0]["owner_id"] != owner_id:
@@ -218,7 +233,8 @@ def get_document(doc_id: str, owner_id: str = Depends(get_owner_id)) -> Document
 
 
 @router.delete("/{doc_id}", status_code=204)
-def delete_document(doc_id: str, owner_id: str = Depends(get_owner_id)) -> Response:
+def delete_document(doc_id: str, user: UserProfile = Depends(get_user_or_guest)) -> Response:
+    owner_id = user.id
     db = get_supabase()
 
     # Confirm document exists and belongs to the caller before deleting

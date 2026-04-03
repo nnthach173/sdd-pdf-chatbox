@@ -2,36 +2,48 @@
 // Base URL is injected from the environment so the same code works
 // in local dev (localhost:8000) and production (Render URL).
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+import { createClient } from '@/lib/supabase';
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000';
 
 // ---------------------------------------------------------------------------
-// Visitor identity
+// Guest identity constants
 // ---------------------------------------------------------------------------
 
-// Each browser profile gets a stable UUID stored in localStorage so that
-// documents uploaded in one browser (or tab) are invisible to others.
-// localStorage is intentional: unlike sessionStorage it survives tab closes
-// and browser restarts, giving users their files back when they return.
-// Incognito windows and new browsers start with empty localStorage, so a
-// fresh UUID is generated there — giving a clean slate automatically.
-//
-// Lazy initialization: getUserId() is only called inside fetch functions, which
-// always run in the browser — avoiding the "localStorage is not defined" error
-// that occurs when Next.js pre-renders this module on the server.
-let _userId: string | null = null;
+export const GUEST_ID_KEY = 'guest-uuid';
+export const GUEST_MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB
 
-function getUserId(): string {
-  if (!_userId) {
-    const STORAGE_KEY = 'pdf-chatbox-user-id';
-    // null is returned when the key is absent (incognito, new browser, cleared storage)
-    let id = localStorage.getItem(STORAGE_KEY);
-    if (!id) {
-      id = crypto.randomUUID();
-      localStorage.setItem(STORAGE_KEY, id);
-    }
-    _userId = id;
+// ---------------------------------------------------------------------------
+// Auth helpers
+// ---------------------------------------------------------------------------
+
+async function getAccessToken(): Promise<string> {
+  const supabase = createClient();
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) {
+    throw new Error('Not authenticated');
   }
-  return _userId;
+  return token;
+}
+
+export function getGuestId(): string {
+  let id = localStorage.getItem(GUEST_ID_KEY);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(GUEST_ID_KEY, id);
+  }
+  return id;
+}
+
+async function requestHeaders(): Promise<Record<string, string>> {
+  const supabase = createClient();
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (token) {
+    return { Authorization: `Bearer ${token}` };
+  }
+  return { 'X-Guest-ID': getGuestId() };
 }
 
 // ---------------------------------------------------------------------------
@@ -77,6 +89,16 @@ export interface ApiError {
 // ---------------------------------------------------------------------------
 
 async function handleResponse<T>(res: Response): Promise<T> {
+  if (res.status === 401) {
+    // Only redirect if we had an active session (session expired).
+    // Guests get a plain error — no redirect.
+    const supabase = createClient();
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      window.location.href = '/auth';
+    }
+    throw new Error('Session expired. Please sign in again.');
+  }
   if (!res.ok) {
     const body: ApiError = await res.json().catch(() => ({
       error: 'unknown',
@@ -94,33 +116,41 @@ async function handleResponse<T>(res: Response): Promise<T> {
 export async function uploadDocument(file: File): Promise<DocumentResponse> {
   const form = new FormData();
   form.append('file', file);
+  const headers = await requestHeaders();
   const res = await fetch(`${BASE_URL}/documents/upload`, {
     method: 'POST',
-    headers: { 'X-User-ID': getUserId() },
+    headers,
     body: form,
   });
   return handleResponse<DocumentResponse>(res);
 }
 
 export async function listDocuments(): Promise<DocumentListItem[]> {
-  const res = await fetch(`${BASE_URL}/documents`, {
-    headers: { 'X-User-ID': getUserId() },
-  });
+  const headers = await requestHeaders();
+  const res = await fetch(`${BASE_URL}/documents`, { headers });
   return handleResponse<DocumentListItem[]>(res);
 }
 
 export async function getDocument(id: string): Promise<DocumentDetail> {
-  const res = await fetch(`${BASE_URL}/documents/${id}`, {
-    headers: { 'X-User-ID': getUserId() },
-  });
+  const headers = await requestHeaders();
+  const res = await fetch(`${BASE_URL}/documents/${id}`, { headers });
   return handleResponse<DocumentDetail>(res);
 }
 
 export async function deleteDocument(id: string): Promise<void> {
+  const headers = await requestHeaders();
   const res = await fetch(`${BASE_URL}/documents/${id}`, {
     method: 'DELETE',
-    headers: { 'X-User-ID': getUserId() },
+    headers,
   });
+  if (res.status === 401) {
+    const supabase = createClient();
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      window.location.href = '/auth';
+    }
+    throw new Error('Session expired. Please sign in again.');
+  }
   if (!res.ok) {
     const body: ApiError = await res.json().catch(() => ({
       error: 'unknown',
@@ -133,9 +163,8 @@ export async function deleteDocument(id: string): Promise<void> {
 export async function getChatHistory(
   documentId: string
 ): Promise<ChatMessage[]> {
-  const res = await fetch(`${BASE_URL}/chat/${documentId}/history`, {
-    headers: { 'X-User-ID': getUserId() },
-  });
+  const headers = await requestHeaders();
+  const res = await fetch(`${BASE_URL}/chat/${documentId}/history`, { headers });
   return handleResponse<ChatMessage[]>(res);
 }
 
@@ -144,11 +173,20 @@ export async function streamChat(
   documentId: string,
   question: string
 ): Promise<Response> {
+  const headers = await requestHeaders();
   const res = await fetch(`${BASE_URL}/chat/${documentId}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-User-ID': getUserId() },
+    headers: { ...headers, 'Content-Type': 'application/json' },
     body: JSON.stringify({ question }),
   });
+  if (res.status === 401) {
+    const supabase = createClient();
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      window.location.href = '/auth';
+    }
+    throw new Error('Session expired. Please sign in again.');
+  }
   if (!res.ok) {
     const body: ApiError = await res.json().catch(() => ({
       error: 'unknown',

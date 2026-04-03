@@ -1,5 +1,7 @@
 'use client';
 
+import UserMenu from '@/components/UserMenu';
+
 interface Props {
   docName?: string | null;
   docStatus?: string | null;
@@ -54,6 +56,7 @@ export default function AppHeader({ docName, docStatus }: Props) {
             className="bg-[#1c2027] rounded-full py-2.5 pl-10 pr-5 w-60 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
           />
         </div>
+        <UserMenu />
       </div>
     </header>
   );

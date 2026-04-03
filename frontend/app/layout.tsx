@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import AuthGuard from "@/components/AuthGuard";
 
 const manrope = Manrope({
   variable: "--font-manrope",
@@ -34,7 +35,9 @@ export default function RootLayout({
       lang="en"
       className={`${manrope.variable} ${inter.variable} ${geistMono.variable} dark h-full antialiased`}
     >
-      <body className="h-full">{children}</body>
+      <body className="h-full">
+        <AuthGuard>{children}</AuthGuard>
+      </body>
     </html>
   );
 }
