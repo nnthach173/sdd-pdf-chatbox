@@ -21,6 +21,8 @@ Auto-generated from all feature plans. Last updated: 2026-04-03
 - TypeScript (React 19 / Next.js 16.2.0 App Router) + `@supabase/ssr` (auth state), Next.js App Router (`useRouter`, `useSearchParams`), Tailwind CSS (010-guest-homepage-access)
 - N/A — no new data stored; auth state read from existing Supabase session (010-guest-homepage-access)
 - Python 3.11 (backend) · TypeScript / Next.js 16.2.0 with React 19 (frontend) + FastAPI, supabase-py (backend) · `@supabase/ssr`, Tailwind CSS (frontend) (011-guest-pdf-upload)
+- Python 3.11 (backend) · TypeScript (frontend) + FastAPI + uvicorn (backend) · Next.js 16.2.0 App Router (frontend) (012-free-deployment)
+- Supabase PostgreSQL + Supabase Storage (no change — existing) (012-free-deployment)
 
 - Python 3.11 (backend) · TypeScript / Node 18+ (frontend) + FastAPI, LangChain, pypdf, openai, supabase-py, uvicorn (001-pdf-rag-chatbox)
 
@@ -41,9 +43,9 @@ cd src; pytest; ruff check .
 Python 3.11 (backend) · TypeScript / Node 18+ (frontend): Follow standard conventions
 
 ## Recent Changes
+- 012-free-deployment: Added Python 3.11 (backend) · TypeScript (frontend) + FastAPI + uvicorn (backend) · Next.js 16.2.0 App Router (frontend)
+- 012-free-deployment: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
 - 011-guest-pdf-upload: Added Python 3.11 (backend) · TypeScript / Next.js 16.2.0 with React 19 (frontend) + FastAPI, supabase-py (backend) · `@supabase/ssr`, Tailwind CSS (frontend)
-- 010-guest-homepage-access: Added TypeScript (React 19 / Next.js 16.2.0 App Router) + `@supabase/ssr` (auth state), Next.js App Router (`useRouter`, `useSearchParams`), Tailwind CSS
-- 009-user-auth: Added Python 3.11 (backend) · TypeScript / Next.js 16.2.0 with React 19 (frontend) + FastAPI, supabase-py (backend) · `@supabase/ssr`, Tailwind CSS, shadcn/ui (frontend)
 
 
 <!-- MANUAL ADDITIONS START -->
