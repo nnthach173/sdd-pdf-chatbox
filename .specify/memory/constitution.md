@@ -1,15 +1,16 @@
 <!--
 SYNC IMPACT REPORT
 ==================
-Version change: 1.0.0 → 1.1.0
+Version change: 1.1.0 → 1.1.1
 Modified principles: N/A
-Added sections:
-  - VII. Code Quality and Readability (new)
-  - VIII. UI/UX Design Philosophy (new)
+Modified constraints:
+  - Technology Constraints: "Next.js 14 (App Router)" → "Next.js 16+ (App Router)"
+    Reason: Project upgraded to Next.js 16.2.0 (React 19). Constitution lagged behind.
+    Identified by /speckit.analyze as CRITICAL issue F1.
 Templates reviewed:
-  - .specify/templates/plan-template.md ✅ (compatible)
+  - .specify/templates/plan-template.md ✅ (no version-specific references)
   - .specify/templates/spec-template.md ✅ (no updates needed)
-  - .specify/templates/tasks-template.md ✅ (compatible)
+  - .specify/templates/tasks-template.md ✅ (no updates needed)
 Follow-up TODOs: None.
 -->
 
@@ -84,7 +85,7 @@ design requirements evolve.
 
 ## Technology Constraints
 
-- **Frontend**: Next.js 14 (App Router) with Tailwind CSS. No additional UI
+- **Frontend**: Next.js 16+ (App Router) with Tailwind CSS. No additional UI
   frameworks without explicit approval.
 - **Backend**: FastAPI (Python 3.11+). All AI orchestration uses LangChain.
 - **Database**: Supabase PostgreSQL with pgvector extension for vector storage.
@@ -112,4 +113,4 @@ versioning, and (3) an update to the Sync Impact Report comment at the top of
 this file. All feature plans MUST include a Constitution Check gate that
 verifies compliance with Principles I–VI before implementation begins.
 
-**Version**: 1.1.0 | **Ratified**: 2026-03-20 | **Last Amended**: 2026-03-20
+**Version**: 1.1.1 | **Ratified**: 2026-03-20 | **Last Amended**: 2026-04-03

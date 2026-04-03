@@ -1,10 +1,12 @@
 import json
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
 from database.supabase_client import get_supabase
 from models.schemas import ChatMessageResponse, ChatRequest
+from models.schemas import UserProfile
+from routers.dependencies import get_user_or_guest
 from services.embedding_service import embed_chunks
 from services.rag_service import build_prompt, retrieve_chunks, stream_response
 
@@ -17,7 +19,12 @@ router = APIRouter()
 
 
 @router.post("/{document_id}")
-async def chat(document_id: str, body: ChatRequest) -> StreamingResponse:
+async def chat(
+    document_id: str,
+    body: ChatRequest,
+    user: UserProfile = Depends(get_user_or_guest),
+) -> StreamingResponse:
+    owner_id = user.id
     if not body.question.strip():
         raise HTTPException(
             status_code=400,
@@ -26,9 +33,9 @@ async def chat(document_id: str, body: ChatRequest) -> StreamingResponse:
 
     db = get_supabase()
 
-    # Verify document exists and is ready
-    rows = db.table("documents").select("status").eq("id", document_id).execute()
-    if not rows.data:
+    # Verify document exists, is owned by the caller, and is ready
+    rows = db.table("documents").select("status, owner_id").eq("id", document_id).execute()
+    if not rows.data or rows.data[0]["owner_id"] != owner_id:
         raise HTTPException(
             status_code=404,
             detail={"error": "not_found", "message": "Document not found."},
@@ -99,8 +106,23 @@ async def chat(document_id: str, body: ChatRequest) -> StreamingResponse:
 
 
 @router.get("/{document_id}/history", response_model=list[ChatMessageResponse])
-def get_chat_history(document_id: str) -> list[ChatMessageResponse]:
+def get_chat_history(
+    document_id: str,
+    user: UserProfile = Depends(get_user_or_guest),
+) -> list[ChatMessageResponse]:
+    owner_id = user.id
     db = get_supabase()
+
+    # Verify document belongs to the caller before returning its messages
+    ownership = (
+        db.table("documents").select("owner_id").eq("id", document_id).execute()
+    )
+    if not ownership.data or ownership.data[0]["owner_id"] != owner_id:
+        raise HTTPException(
+            status_code=404,
+            detail={"error": "not_found", "message": "Document not found."},
+        )
+
     rows = (
         db.table("chat_messages")
         .select("id, role, content, created_at")

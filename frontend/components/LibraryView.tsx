@@ -7,6 +7,7 @@ import DocumentList from '@/components/DocumentList';
 
 interface Props {
   onDocumentOpen: (docId: string) => void;
+  isGuest?: boolean;
 }
 
 export interface LibraryViewHandle {
@@ -20,7 +21,7 @@ function hasPendingStatus(docs: DocumentListItem[]): boolean {
 }
 
 const LibraryView = forwardRef<LibraryViewHandle, Props>(function LibraryView(
-  { onDocumentOpen },
+  { onDocumentOpen, isGuest },
   ref
 ) {
   const [documents, setDocuments] = useState<DocumentListItem[]>([]);
@@ -90,7 +91,7 @@ const LibraryView = forwardRef<LibraryViewHandle, Props>(function LibraryView(
     <div className="max-w-7xl mx-auto px-12 pb-24">
       {/* Hero upload zone */}
       <section className="mb-16">
-        <DocumentUpload ref={uploadRef} onUploaded={handleUploaded} />
+        <DocumentUpload ref={uploadRef} onUploaded={handleUploaded} isGuest={isGuest} />
       </section>
 
       {loadError && (
