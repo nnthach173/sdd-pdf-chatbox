@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Manrope, Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthGuard from "@/components/AuthGuard";
@@ -36,7 +37,9 @@ export default function RootLayout({
       className={`${manrope.variable} ${inter.variable} ${geistMono.variable} dark h-full antialiased`}
     >
       <body className="h-full">
-        <AuthGuard>{children}</AuthGuard>
+        <Suspense>
+          <AuthGuard>{children}</AuthGuard>
+        </Suspense>
       </body>
     </html>
   );
