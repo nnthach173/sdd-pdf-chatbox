@@ -5,7 +5,8 @@ from fastapi.responses import StreamingResponse
 
 from database.supabase_client import get_supabase
 from models.schemas import ChatMessageResponse, ChatRequest
-from routers.dependencies import get_owner_id
+from models.schemas import UserProfile
+from routers.dependencies import get_user_or_guest
 from services.embedding_service import embed_chunks
 from services.rag_service import build_prompt, retrieve_chunks, stream_response
 
@@ -21,8 +22,9 @@ router = APIRouter()
 async def chat(
     document_id: str,
     body: ChatRequest,
-    owner_id: str = Depends(get_owner_id),
+    user: UserProfile = Depends(get_user_or_guest),
 ) -> StreamingResponse:
+    owner_id = user.id
     if not body.question.strip():
         raise HTTPException(
             status_code=400,
@@ -106,8 +108,9 @@ async def chat(
 @router.get("/{document_id}/history", response_model=list[ChatMessageResponse])
 def get_chat_history(
     document_id: str,
-    owner_id: str = Depends(get_owner_id),
+    user: UserProfile = Depends(get_user_or_guest),
 ) -> list[ChatMessageResponse]:
+    owner_id = user.id
     db = get_supabase()
 
     # Verify document belongs to the caller before returning its messages

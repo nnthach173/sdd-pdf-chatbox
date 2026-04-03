@@ -4,6 +4,16 @@ from typing import Optional
 from pydantic import BaseModel
 
 
+class UserProfile(BaseModel):
+    """Authenticated user profile returned by GET /auth/me."""
+
+    id: str
+    email: str
+    display_name: Optional[str] = None
+    avatar_url: Optional[str] = None
+    is_guest: bool = False
+
+
 class DocumentResponse(BaseModel):
     """Returned after a successful upload (status = processing)."""
 

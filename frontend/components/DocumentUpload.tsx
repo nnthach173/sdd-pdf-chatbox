@@ -1,10 +1,11 @@
 'use client';
 
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { uploadDocument, type DocumentResponse } from '@/lib/api';
+import { uploadDocument, GUEST_MAX_FILE_SIZE, type DocumentResponse } from '@/lib/api';
 
 interface Props {
   onUploaded: (doc: DocumentResponse) => void;
+  isGuest?: boolean;
 }
 
 export interface DocumentUploadHandle {
@@ -12,7 +13,7 @@ export interface DocumentUploadHandle {
 }
 
 const DocumentUpload = forwardRef<DocumentUploadHandle, Props>(function DocumentUpload(
-  { onUploaded },
+  { onUploaded, isGuest = false },
   ref
 ) {
   const [dragging, setDragging] = useState(false);
@@ -25,14 +26,15 @@ const DocumentUpload = forwardRef<DocumentUploadHandle, Props>(function Document
     trigger: () => inputRef.current?.click(),
   }));
 
-  const MAX_SIZE = 50 * 1024 * 1024;
-
   function validate(file: File): string | null {
     if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
       return 'Only PDF files are supported.';
     }
-    if (file.size > MAX_SIZE) {
-      return 'File exceeds the 50 MB limit.';
+    const maxSize = isGuest ? GUEST_MAX_FILE_SIZE : 50 * 1024 * 1024;
+    if (file.size > maxSize) {
+      return isGuest
+        ? 'File exceeds the 1 MB limit for guests. Sign in to upload larger files.'
+        : 'File exceeds the 50 MB limit.';
     }
     return null;
   }
@@ -105,7 +107,9 @@ const DocumentUpload = forwardRef<DocumentUploadHandle, Props>(function Document
             Drop your research here
           </h3>
           <p className="text-muted-foreground max-w-md mx-auto mb-8 font-body font-medium">
-            Upload PDF documents to transform them into interactive knowledge artifacts. Max file size 50 MB.
+            {isGuest
+              ? 'Max file size 1 MB for guests · Sign in to upload up to 50 MB.'
+              : 'Upload PDF documents to transform them into interactive knowledge artifacts. Max file size 50 MB.'}
           </p>
 
           <div className="flex gap-4">
