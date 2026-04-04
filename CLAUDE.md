@@ -1,52 +1,101 @@
-﻿# pdf-chatbox Development Guidelines
+# pdf-chatbox
 
-Auto-generated from all feature plans. Last updated: 2026-04-03
+A RAG-powered PDF chatbox. Users upload PDFs, the backend chunks and embeds them, and a chat interface answers questions grounded in the document content.
 
-## Active Technologies
-- [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION] (002-pdf-split-view)
-- [if applicable, e.g., PostgreSQL, CoreData, files or N/A] (002-pdf-split-view)
-- Python 3.11 (backend) · TypeScript / Next.js 14 App Router (frontend) + FastAPI, supabase-py (backend) · Tailwind CSS, shadcn/ui (frontend) (002-pdf-split-view)
-- Supabase Storage — signed URL generation via `create_signed_url(path, expires_in=3600)` (002-pdf-split-view)
-- Python 3.11 (backend) · TypeScript / Next.js 16.2.0 with React 19 (frontend) + FastAPI, supabase-py (backend) · `react-pdf` v9.x, Tailwind CSS, shadcn/ui (frontend) (002-pdf-split-view)
-- Supabase Storage — signed URL via `create_signed_url(file_path, expires_in=3600)` (002-pdf-split-view)
-- TypeScript / Next.js (App Router) — frontend only + React 19, Next.js `useSearchParams`, `useRouter`, Tailwind CSS, existing components (PanelDivider, PdfViewer, ChatInterface, DocumentUpload, DocumentList) (005-persistent-layout-nav)
-- `localStorage` for split ratio preference (key: `obsidian-split-ratio`) (005-persistent-layout-nav)
-- TypeScript / React 19 + Next.js 14 (App Router), Tailwind CSS (006-chat-independent-scroll)
-- N/A — frontend layout change only (006-chat-independent-scroll)
-- TypeScript / React 19 + Next.js 16.2.0 (App Router) + Tailwind CSS (layout utility classes only) (007-independent-scroll)
-- Python 3.11 (backend) · TypeScript / Next.js 16.2.0 with React 19 (frontend) + FastAPI, supabase-py (backend) · Tailwind CSS, shadcn/ui (frontend) (008-per-user-storage)
-- Supabase PostgreSQL (pgvector) + Supabase Storage (`pdfs` bucket) (008-per-user-storage)
-- Python 3.11 (backend) · TypeScript / Next.js 16.2.0 with React 19 (frontend) + FastAPI, supabase-py (backend) · `@supabase/ssr`, Tailwind CSS, shadcn/ui (frontend) (009-user-auth)
-- Supabase PostgreSQL (pgvector) + Supabase Storage (`pdfs` bucket) + Supabase Auth (009-user-auth)
-- TypeScript (React 19 / Next.js 16.2.0 App Router) + `@supabase/ssr` (auth state), Next.js App Router (`useRouter`, `useSearchParams`), Tailwind CSS (010-guest-homepage-access)
-- N/A — no new data stored; auth state read from existing Supabase session (010-guest-homepage-access)
-- Python 3.11 (backend) · TypeScript / Next.js 16.2.0 with React 19 (frontend) + FastAPI, supabase-py (backend) · `@supabase/ssr`, Tailwind CSS (frontend) (011-guest-pdf-upload)
-- Python 3.11 (backend) · TypeScript (frontend) + FastAPI + uvicorn (backend) · Next.js 16.2.0 App Router (frontend) (012-free-deployment)
-- Supabase PostgreSQL + Supabase Storage (no change — existing) (012-free-deployment)
+---
 
-- Python 3.11 (backend) · TypeScript / Node 18+ (frontend) + FastAPI, LangChain, pypdf, openai, supabase-py, uvicorn (001-pdf-rag-chatbox)
+## Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | Python 3.11, FastAPI, uvicorn |
+| Backend libs | LangChain, pypdf, openai, supabase-py |
+| Frontend | Next.js 16.2.0 (App Router), React 19, TypeScript |
+| Frontend libs | `@supabase/ssr`, react-pdf v9, Tailwind CSS, shadcn/ui |
+| Database | Supabase PostgreSQL + pgvector |
+| Storage | Supabase Storage (`pdfs` bucket) |
+| Auth | Supabase Auth |
+
+---
 
 ## Project Structure
 
-```text
-backend/
-frontend/
-tests/
 ```
+backend/
+  main.py               — FastAPI app entry point
+  routers/              — auth.py, chat.py, documents.py, dependencies.py
+  services/             — embedding_service.py, pdf_service.py, rag_service.py
+  models/
+  database/
+  pyproject.toml
+  requirements.txt
+
+frontend/
+  app/                  — Next.js App Router pages (layout.tsx, page.tsx, auth/page.tsx)
+  components/           — AppHeader, AppSidebar, AuthForm, AuthGuard, ChatInterface,
+                          ChatMessage, ChatView, DocumentCard, DocumentList,
+                          DocumentUpload, HomeClient, LibraryView, PanelDivider,
+                          PdfViewer, UserMenu
+  components/ui/        — shadcn/ui primitives (button, badge, card, dialog, textarea)
+```
+
+---
 
 ## Commands
 
-cd src; pytest; ruff check .
+```bash
+# Backend
+cd backend && uvicorn main:app --reload          # start dev server
+cd backend && pytest                             # run tests
+cd backend && ruff check .                       # lint
+
+# Frontend
+cd frontend && npm run dev                       # start dev server
+cd frontend && npm run build                     # production build
+```
+
+---
+
+## Architecture Rules
+
+These constraints must be respected in every feature and spec:
+
+- **Auth is handled by `@supabase/ssr` on the frontend and `dependencies.py` on the backend.** Do not duplicate auth checks in individual routes or components.
+- **All file uploads go through the backend.** Never upload directly from the browser to Supabase Storage.
+- **Embeddings are stored in `document_chunks` (pgvector).** Never regenerate embeddings on read — only on ingest.
+- **Signed URLs for PDFs** are generated server-side via `create_signed_url(file_path, expires_in=3600)`. Never expose raw storage paths to the client.
+- **Guest users** can upload and chat without an account. Per-user storage is scoped by auth session when logged in.
+- **Split panel layout** persists the ratio in `localStorage` under key `obsidian-split-ratio`.
+
+---
 
 ## Code Style
 
-Python 3.11 (backend) · TypeScript / Node 18+ (frontend): Follow standard conventions
+- **TypeScript:** No `any` — always type explicitly. Use `interface` for object shapes.
+- **Python:** Pydantic models for all request/response validation. No bare `dict` in route signatures.
+- **Components:** Functional only — no class components.
+- **CSS:** Tailwind utility classes only — no custom CSS files unless unavoidable.
+- **Imports:** Use absolute imports from the project root, not relative `../../../`.
 
-## Recent Changes
-- 012-free-deployment: Added Python 3.11 (backend) · TypeScript (frontend) + FastAPI + uvicorn (backend) · Next.js 16.2.0 App Router (frontend)
-- 012-free-deployment: Added [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION] + [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]
-- 011-guest-pdf-upload: Added Python 3.11 (backend) · TypeScript / Next.js 16.2.0 with React 19 (frontend) + FastAPI, supabase-py (backend) · `@supabase/ssr`, Tailwind CSS (frontend)
+---
 
+## What NOT to Do
 
-<!-- MANUAL ADDITIONS START -->
-<!-- MANUAL ADDITIONS END -->
+- Do not rename or drop Supabase DB columns without a migration plan — the cost is high.
+- Do not add optimistic UI without discussing first — correctness over perceived speed.
+- Do not commit `.env` or any file containing API keys or secrets.
+- Do not mock the database in tests — tests must use the real schema.
+- Do not add speculative abstractions, helpers, or utilities for one-time use.
+- Do not add error handling for scenarios that cannot happen — only validate at system boundaries.
+
+---
+
+## Spec-Driven Development
+
+Feature work follows the speckit workflow:
+1. `speckit.specify` — write the feature spec
+2. `speckit.plan` — design the implementation plan
+3. `speckit.tasks` — generate ordered tasks
+4. `speckit.implement` — execute tasks with checkpoints
+
+Feature specs live in `specs/`. The stack, constraints, and rules above apply to every spec — do not restate them per feature.
